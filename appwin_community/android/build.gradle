@@ -1,0 +1,80 @@
+// Android side of the `appwin_community` Flutter plugin.
+//
+// It compiles the glue **only**: the feed, the comments and the profiles live in
+// the `io.appwin:appwin-community` AAR, built by `sdk/android-build`
+// (pendant exact des `s.dependency` du podspec iOS, cf. ADR-0020).
+//
+// Compose is enabled here because the embedded view is a `ComposeView` hosting
+// the native screen: the glue has to compile composable code, even if it only
+// writes one line of it.
+group = "io.appwin.flutter.community"
+version = "0.0.1"
+
+buildscript {
+    ext.kotlin_version = "2.1.0"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.7.3"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:$kotlin_version"
+    }
+}
+
+// Repositories declared for this module only: a plugin has no business
+// rewriting the dependency resolution of the app that installs it.
+repositories {
+    google()
+    mavenCentral()
+}
+
+// Keep aligned with `appwinSdkVersion` in
+// `sdk/android-build/gradle.properties`.
+ext.appwinSdkVersion = "0.1.0"
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+apply plugin: "org.jetbrains.kotlin.plugin.compose"
+
+android {
+    namespace = "io.appwin.flutter.community"
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+}
+
+dependencies {
+    implementation "io.appwin:appwin-community:$appwinSdkVersion"
+
+    implementation platform("androidx.compose:compose-bom:2024.12.01")
+    implementation "androidx.compose.ui:ui"
+    implementation "androidx.compose.runtime:runtime"
+
+    // Lifecycle owners installed by hand on the view (see
+    // AppwinCommunityPlatformView): a `ComposeView` refuses to compose without
+    // them, and a Flutter PlatformView's view tree provides none.
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.8.7"
+    implementation "androidx.savedstate:savedstate-ktx:1.2.1"
+}

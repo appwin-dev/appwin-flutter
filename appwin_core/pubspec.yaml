@@ -1,0 +1,29 @@
+name: appwin_core
+description: "Flutter foundation for the Appwin SDKs: one configure, plus the device identity and session shared by every product."
+version: 0.1.1
+homepage: https://appwin.io
+repository: https://github.com/appwin-dev/appwin-flutter/tree/main/appwin_core
+issue_tracker: https://github.com/appwin-dev/appwin-flutter/issues
+
+environment:
+  sdk: ^3.9.2
+  flutter: '>=3.3.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  plugin:
+    platforms:
+      ios:
+        pluginClass: AppwinCorePlugin
+      android:
+        package: io.appwin.flutter.core
+        pluginClass: AppwinCorePlugin

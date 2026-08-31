@@ -1,0 +1,67 @@
+// Android side of the `appwin_support` Flutter plugin.
+//
+// It compiles the glue **only**: the implementation lives in the AARs
+// `io.appwin:appwin-support` et `io.appwin:appwin-notifications`, construits
+// built by `sdk/android-build`. Exact counterpart of the iOS podspec's
+// podspec iOS (cf. ADR-0020).
+//
+// Why Notifications here: the plugin exposes the push token and the in-app
+// messages, like the iOS glue. The token goes through the Support route, which
+// does not require the Notifications product, and the messages through the
+// Notifications module - the same split as on iOS, so both platforms hit the
+// same endpoints.
+group = "io.appwin.flutter.support"
+version = "0.0.1"
+
+buildscript {
+    ext.kotlin_version = "2.1.0"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.7.3"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+// Repositories declared for this module only: a plugin has no business
+// rewriting the dependency resolution of the app that installs it.
+repositories {
+    google()
+    mavenCentral()
+}
+
+// Keep aligned with `appwinSdkVersion` in
+// `sdk/android-build/gradle.properties`.
+ext.appwinSdkVersion = "0.1.0"
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+android {
+    namespace = "io.appwin.flutter.support"
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+}
+
+dependencies {
+    implementation "io.appwin:appwin-support:$appwinSdkVersion"
+    implementation "io.appwin:appwin-notifications:$appwinSdkVersion"
+}

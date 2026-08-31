@@ -1,0 +1,27 @@
+## 0.2.1
+
+* Real example app: configure, initialise, then render from the answer. It was
+  still the Flutter template, which called neither.
+* Package page: simpler snippets that print the result instead of wiring state,
+  and a clearer note on installing `appwin_core` (you do not).
+
+## 0.2.0
+
+Exposes `AppwinInitResult`, the answer returned by each product's
+`initialize()`. `configure()` itself is unchanged.
+
+## 0.1.1
+
+* Package page rewritten for pub.dev: what Appwin is, what this package does,
+  installation, a minimal start, and links to the guide for the rest.
+* Real licence file instead of the Flutter template placeholder.
+
+## 0.1.0
+
+* First published release. Bridges the native iOS and Android SDKs.
+
+## 0.0.1
+
+* Initial version: a single `configure` for every product, session
+  (`bootstrapSession`), identity (`identify`, `clearIdentity`, `signOut`),
+  `deviceId`. iOS and Android.

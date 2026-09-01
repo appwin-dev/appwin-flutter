@@ -1,0 +1,65 @@
+// Android side of the `appwin_notifications` Flutter plugin.
+//
+// It compiles the glue **only**: push registration, automation events and
+// in-app message delivery live in the `io.appwin:appwin-notifications` AAR
+// (the exact counterpart of the iOS podspec's `s.dependency`, cf. ADR-0020).
+//
+// No Compose here, unlike the Support and Community plugins: this product
+// draws nothing. The app renders the in-app messages it is handed.
+group = "io.appwin.flutter.notifications"
+version = "0.0.1"
+
+buildscript {
+    ext.kotlin_version = "2.1.0"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.7.3"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+// Repositories declared for this module only: a plugin has no business
+// rewriting the dependency resolution of the app that installs it.
+repositories {
+    google()
+    mavenCentral()
+}
+
+// Keep aligned with `appwinSdkVersion` in
+// `sdk/android-build/gradle.properties`.
+ext.appwinSdkVersion = "0.3.0"
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+android {
+    namespace = "io.appwin.flutter.notifications"
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+}
+
+dependencies {
+    // `appwin-core` arrives as an `api` dependency of this module, so the
+    // plugin's `io.appwin.core.availability.*` imports compile without
+    // redeclaring it.
+    implementation "io.appwin:appwin-notifications:$appwinSdkVersion"
+}

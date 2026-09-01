@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  packages:
+    name: Analyze + tests (4 paquets)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # À garder aligné sur la version des postes de l'équipe.
+          flutter-version: '3.41.5'
+          cache: true
+      - name: Analyze + tests par paquet
+        run: |
+          for pkg in appwin_core appwin_support appwin_community appwin_notifications; do
+            echo "=== $pkg ==="
+            (cd "$pkg" && flutter pub get && flutter analyze && { [ -d test ] && flutter test || echo "(pas de tests)"; })
+          done

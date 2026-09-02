@@ -1,0 +1,59 @@
+name: CI
+
+# Written in the monorepo under `sdk/appwin-flutter/`, run in the published
+# mirror: GitHub reads workflows from the repository root alone. See the note in
+# the iOS mirror's workflow for why it is authored here and not there.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter:
+    name: Dart
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # Kept aligned with the version the team runs: a newer SDK than the
+          # one on the machines would fail CI on code that compiles locally, and
+          # an older one would let regressions through.
+          flutter-version: '3.41.5'
+          cache: true
+
+      # The three plugins depend on `appwin_core` by version. Left to pub.dev,
+      # this run would check the last published Core against the working tree's
+      # plugins, and would fail outright between the git tag and the pub.dev
+      # publish, when that version exists on no registry. The sibling folder is
+      # the code the run is meant to verify.
+      #
+      # `pubspec_overrides.yaml` rather than the pubspec: the manifest is what
+      # studios resolve, and it must keep pointing at the registry.
+      - name: Resolve appwin_core from the sibling folder
+        run: |
+          for plugin in appwin_support appwin_community appwin_notifications; do
+            printf 'dependency_overrides:\n  appwin_core:\n    path: ../appwin_core\n' \
+              > "$plugin/pubspec_overrides.yaml"
+          done
+
+      - name: Analyze and test
+        run: |
+          for plugin in appwin_core appwin_support appwin_community appwin_notifications; do
+            # `pub get` first: without it the analysis fails on a fresh clone,
+            # and the message does not say resolution is what is missing.
+            (cd "$plugin" && flutter pub get && flutter analyze)
+            # A plugin with no test folder is skipped: `flutter test` treats a
+            # missing folder as a failure.
+            if ls "$plugin"/test/*_test.dart >/dev/null 2>&1; then
+              (cd "$plugin" && flutter test)
+            fi
+          done

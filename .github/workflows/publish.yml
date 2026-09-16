@@ -1,0 +1,72 @@
+name: Publish
+
+# This file lives in the monorepo under `sdk/appwin-flutter/` and runs only in
+# the published mirror (same travel mechanism as ci.yml). It fires on the
+# release tag that `sdk/scripts/release.mjs --push` creates.
+#
+# NO secret at all: pub.dev trusts this repository through OIDC. One-time
+# setup per package, on pub.dev > package > Admin > Automated publishing:
+#   repository `appwin-dev/appwin-flutter`, tag pattern `{{version}}`
+#   (our tags are bare versions, not v-prefixed).
+
+on:
+  push:
+    tags: ['[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  id-token: write # OIDC token exchange with pub.dev
+  contents: read # a permissions block resets everything else, checkout needs this back
+
+concurrency:
+  group: publish-${{ github.ref }}
+
+jobs:
+  # Same validation as a push to main: publishing waits for green.
+  checks:
+    uses: ./.github/workflows/ci.yml
+  pub:
+    needs: checks
+    name: pub.dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      # The pub client does NOT mint the OIDC token itself (npm does):
+      # that step normally lives in dart-lang/setup-dart, which we skip
+      # because flutter-action ships the Dart SDK. Without it, publish
+      # falls back to interactive browser auth and hangs until the job
+      # timeout - one hour of "Waiting for your authorization" learned
+      # the hard way on 0.5.2.
+      - name: Exchange the OIDC token with pub.dev
+        run: |
+          RESPONSE=$(curl -sS -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://pub.dev")
+          echo "PUB_TOKEN=$(echo "$RESPONSE" | jq -r .value)" >> "$GITHUB_ENV"
+
+      - name: Register the token with pub
+        run: dart pub token add https://pub.dev --env-var PUB_TOKEN
+
+      # appwin_core first: the other packages pin it with a caret range,
+      # and pub.dev must serve the new version before it can validate
+      # theirs. The retry absorbs the indexing delay.
+      - name: Publish the packages
+        run: |
+          for pkg in appwin_core appwin_support appwin_community appwin_notifications; do
+            cd "$pkg"
+            flutter pub get
+            for attempt in 1 2 3 4 5; do
+              if dart pub publish --force; then
+                break
+              elif [ "$attempt" = 5 ]; then
+                echo "$pkg failed after 5 attempts"; exit 1
+              else
+                echo "retrying $pkg in 60s (attempt $attempt failed)"; sleep 60
+              fi
+            done
+            cd ..
+          done

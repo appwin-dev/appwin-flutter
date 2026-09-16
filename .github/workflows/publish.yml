@@ -1,0 +1,57 @@
+name: Publish
+
+# This file lives in the monorepo under `sdk/appwin-flutter/` and runs only in
+# the published mirror (same travel mechanism as ci.yml). It fires on the
+# release tag that `sdk/scripts/release.mjs --push` creates.
+#
+# NO secret at all: pub.dev trusts this repository through OIDC. One-time
+# setup per package, on pub.dev > package > Admin > Automated publishing:
+#   repository `appwin-dev/appwin-flutter`, tag pattern `{{version}}`
+#   (our tags are bare versions, not v-prefixed).
+
+on:
+  push:
+    tags: ['[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  id-token: write # OIDC token exchange with pub.dev
+  contents: read # a permissions block resets everything else, checkout needs this back
+
+concurrency:
+  group: publish-${{ github.ref }}
+
+jobs:
+  # Same validation as a push to main: publishing waits for green.
+  checks:
+    uses: ./.github/workflows/ci.yml
+  pub:
+    needs: checks
+    name: pub.dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      # appwin_core first: the other packages pin it with a caret range,
+      # and pub.dev must serve the new version before it can validate
+      # theirs. The retry absorbs the indexing delay.
+      - name: Publish the packages
+        run: |
+          for pkg in appwin_core appwin_support appwin_community appwin_notifications; do
+            cd "$pkg"
+            flutter pub get
+            for attempt in 1 2 3 4 5; do
+              if dart pub publish --force; then
+                break
+              elif [ "$attempt" = 5 ]; then
+                echo "$pkg failed after 5 attempts"; exit 1
+              else
+                echo "retrying $pkg in 60s (attempt $attempt failed)"; sleep 60
+              fi
+            done
+            cd ..
+          done

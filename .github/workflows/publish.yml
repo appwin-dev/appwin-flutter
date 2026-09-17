@@ -12,6 +12,11 @@ name: Publish
 on:
   push:
     tags: ['[0-9]+.[0-9]+.[0-9]+']
+  # Manual re-run after a partial publish (the version skip makes it
+  # idempotent). MUST target the release tag - pub.dev checks the OIDC
+  # ref claim against the `{{version}}` tag pattern, a dispatch on main
+  # is refused:  gh workflow run publish.yml --ref <version>
+  workflow_dispatch:
 
 permissions:
   id-token: write # OIDC token exchange with pub.dev
@@ -53,14 +58,21 @@ jobs:
 
       # appwin_core first: the other packages pin it with a caret range,
       # and pub.dev must serve the new version before it can validate
-      # theirs. The retry absorbs the indexing delay.
+      # theirs. The retry absorbs the indexing delay - `flutter pub get`
+      # must be INSIDE the loop: it is the step that hits the not-yet-
+      # indexed appwin_core (0.6.0 left three packages behind when it
+      # sat outside). The skip makes re-runs idempotent.
       - name: Publish the packages
         run: |
           for pkg in appwin_core appwin_support appwin_community appwin_notifications appwin_analytics appwin_attribution; do
             cd "$pkg"
-            flutter pub get
+            VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+            if curl -sf "https://pub.dev/api/packages/$pkg" | jq -e --arg v "$VERSION" 'any(.versions[]; .version == $v)' > /dev/null; then
+              echo "$pkg $VERSION already on pub.dev, skipping"
+              cd ..; continue
+            fi
             for attempt in 1 2 3 4 5; do
-              if dart pub publish --force; then
+              if flutter pub get && dart pub publish --force; then
                 break
               elif [ "$attempt" = 5 ]; then
                 echo "$pkg failed after 5 attempts"; exit 1

@@ -1,0 +1,62 @@
+// Android side of the `appwin_core` Flutter plugin.
+//
+// It compiles the glue **only**: the implementation lives in the
+// `io.appwin:appwin-core` AAR, built by `sdk/android-build` (ADR-0020,
+// pendant exact du `s.dependency 'AppwinCore'` du podspec iOS).
+group = "io.appwin.flutter.core"
+version = "0.0.1"
+
+buildscript {
+    ext.kotlin_version = "2.1.0"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.7.3"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+// Repositories declared for this module only, rather than through `allprojects`
+// as the Flutter template does: a plugin has no business rewriting the
+// dependency resolution of the app that installs it.
+repositories {
+    google()
+    mavenCentral()
+}
+
+// Native AAR version. `*-local` so Maven Central's same-version release cannot
+// shadow a fresh publishToMavenLocal (DecorView in-app banners, etc.). Align
+// with RN (`0.9.3-local`). Publish:
+// `./gradlew publishToMavenLocal -PappwinSdkVersion=0.9.3-local`
+ext.appwinSdkVersion = "0.10.0"
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+android {
+    namespace = "io.appwin.flutter.core"
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+}
+
+dependencies {
+    implementation "io.appwin:appwin-core:$appwinSdkVersion"
+}

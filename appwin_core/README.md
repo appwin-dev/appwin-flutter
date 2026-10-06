@@ -1,0 +1,108 @@
+# appwin_core
+
+`appwin_core` is the foundation of the Appwin SDKs for Flutter. It carries what
+every Appwin product shares: the device identity, the authenticated session and
+the network client. You configure it once, and the products you installed use
+it.
+
+**Appwin** is an engagement platform for mobile app studios. It puts an in-app
+support messenger, a community feed and push notifications inside your app, all
+rendered natively, and gives your team one dashboard to run them.
+
+- [appwin.io](https://appwin.io)
+- [Documentation](https://appwin.io/docs)
+- [Quickstart](https://appwin.io/docs/sdk/installation)
+
+## Features
+
+- ✅ **One `configure`** for every Appwin product in your app, whatever the number
+- ✅ **Anonymous by default** - a device is known without asking anyone to sign up
+- ✅ **`identify`** attaches your own user id when someone signs in
+- ✅ **One identity across products** - sign in once, recognised in Support and Community
+- ✅ **`logout`** clears the person without losing the device
+- ✅ **Native under the hood** - Swift on iOS, Kotlin on Android
+
+## Installation
+
+```bash
+flutter pub add appwin_core
+```
+
+Most apps never run that command. Every Appwin product declares `appwin_core`
+as a dependency **and re-exports it**, so installing `appwin_support` or
+`appwin_community` already gives you `AppwinCore` under the same import. Add it
+directly only if you want the identity API with no product at all.
+
+### Requirements
+
+| Platform | Minimum |
+| --- | --- |
+| iOS | 16.0 |
+| Android | 7.0 (API 24) |
+
+Nothing to add to your `Podfile` or to your Gradle repositories: the plugin
+declares the native SDKs it needs, from CocoaPods and Maven Central.
+
+## Getting started
+
+Configure once, at launch:
+
+```dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppwinCore.instance.configure(appId: 'your-app-id');
+  runApp(const MyApp());
+}
+```
+
+When someone signs in to your app:
+
+```dart
+await AppwinCore.instance.identify(
+  user.id,
+  attributes: AppwinUserAttributes(email: user.email, name: user.displayName),
+);
+```
+
+One call: the id is kept on the device and the session reopens under it. What
+you learn later goes through `updateUser`:
+
+```dart
+await AppwinCore.instance.updateUser(AppwinUserAttributes(plan: 'premium'));
+```
+
+On sign-out:
+
+```dart
+await AppwinCore.instance.logout();
+```
+
+## One `configure`, then one `initialize()` per product
+
+`configure` prepares the foundation and checks nothing. Each product you
+install has its own `initialize()`, which asks the server whether that product
+may open for this app, and answers rather than throwing:
+
+```dart
+final support = await AppwinSupport.instance.initialize();
+debugPrint('Appwin Support: $support');   // ready / unavailable(plan) / ...
+
+if (support.isReady) {
+  // Show your help button.
+}
+```
+
+Gate your own entry point on that result: the SDK cannot hide your tab or your
+button, it does not own your navigation. The three products share one round
+trip and the verdict is cached on disk, so being offline falls back to the last
+known answer instead of closing a product you pay for.
+
+## Documentation
+
+- [Install the SDK](https://appwin.io/docs/sdk/installation)
+- [Identity: anonymous and signed-in users](https://appwin.io/docs/sdk/identity)
+- [Appwin Core](https://appwin.io/docs/products/appwin-core)
+
+## License
+
+Proprietary. Use is reserved to studios holding a current Appwin contract.

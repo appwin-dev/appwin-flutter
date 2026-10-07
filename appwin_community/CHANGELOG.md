@@ -1,0 +1,126 @@
+## 0.11.1
+
+Android SDK 0.11.1: session replay fix in release builds (see `appwin_analytics`).
+No API change on this side.
+
+## 0.11.0
+
+Native SDKs 0.11.0: session replay in Analytics (see `appwin_analytics`).
+No API change on this side.
+
+## 0.10.0
+
+**Native SDKs 0.10.0.** Reactions on posts (heart by default, toggle, read-only
+breakdown for the author) and an in-app banner when the app is open.
+
+- No more gap under the Community button when embedded in a Flutter screen
+  whose tab bar already handles the bottom inset.
+
+## 0.9.2
+
+**Native SDKs 0.9.2.** Support and Community screens aligned on the InApp
+mockups: customizable gradient, `colorScheme` and `grayWarmth` from the
+dashboard, Help Center title and welcome message, "My inbox" hidden until a
+conversation exists. No API change on this side.
+
+## 0.9.1
+
+Native SDKs 0.9.1: `registerPushToken` waits for the session before posting
+and retries once with a fresh session after a 401 caused by a concurrent
+`identify`. No API change on the Dart side.
+
+## 0.9.0
+
+- `events`: a stream of the current member's own actions (post, comment,
+  reply, reaction, profile), once the server accepted them. Built for
+  gamification.
+- `unreadNotificationCountStream`: the unread count, live, for a badge.
+- `onNotificationTap` and `openPost(postId, {commentId})`: route a
+  notification tap to your Community tab yourself. Unset, a tap now opens the
+  post even when the feed is not on screen, full screen over the app. Set it
+  before `initialize()`.
+- `onEditProfile`: replaces the SDK's profile editor with yours; push the
+  result with `setUser`.
+- `lastResult`: the current verdict, kept live.
+- `AppwinCommunityView(unavailableBuilder: ...)`: your own UI while Community
+  is not ready. Without it, the native "coming soon" placeholder replaces the
+  empty view, with a diagnosis card in debug builds.
+- Debug builds unlock Community without the plan; release builds still need
+  it.
+
+## 0.8.0
+
+- **Breaking:** `login` and `logout` are removed: use `AppwinCore.instance.identify(...)` and `AppwinCore.instance.logout()`. `setUser` (public community profile) stays.
+
+## 0.5.1
+
+- iOS via CocoaPods is fixed. The podspec asked for `AppwinCore ~> 0.1`, a range
+  an old `Podfile.lock` already satisfied, so `pod install` never upgraded the
+  native SDK and the build failed on a symbol the pinned Core did not have. It
+  now pins `>= 0.5.1, < 1.0.0`. Native 0.5.1 also restores the CocoaPods build,
+  which 0.5.0 broke outright. No Dart API change.
+
+## 0.5.0
+
+- Version aligned with `appwin_core` 0.5.0 and its siblings. No change to the
+  Dart API; the native feed follows the Figma designs.
+
+## 0.4.1
+
+- **Fix.** `AppwinCommunityView` crashed the app on Android, in SIGABRT rather
+  than a Dart error: lacking a parent composition context, Compose looked for a
+  lifecycle owner on the root of the view tree, which under Flutter has none.
+  The view now supplies its own.
+- Documentation on the whole public API, up from 52%: what the product is, and
+  every member of the platform interface, the method channel and the profile.
+
+## 0.4.0
+
+- Version aligned with `appwin_core` 0.4.0 and its siblings. No change to the
+  API: push tokens are registered through `AppwinCore.registerPushToken()`, and
+  this package never exposed one of its own.
+
+## 0.3.0
+
+* New sibling package `appwin_notifications`: push tokens, automation events
+  and in-app messages. The product existed natively and in React Native but
+  had no Flutter package.
+
+## 0.2.1
+
+* Real example app: configure, initialise, then render from the answer. It was
+  still the Flutter template, which called neither.
+* Package page: simpler snippets that print the result instead of wiring state,
+  and a clearer note on installing `appwin_core` (you do not).
+
+## 0.2.0
+
+**Breaking.** `initialize()` no longer takes an `appId` and no longer
+configures the foundation. Call `AppwinCore.instance.configure()` first, then
+`initialize()`, which answers whether this product may open for your app.
+
+## 0.1.1
+
+* Package page rewritten for pub.dev: what Appwin is, what this package does,
+  installation, a minimal start, and links to the guide for the rest.
+* Real licence file instead of the Flutter template placeholder.
+
+## 0.1.0
+
+* First published release.
+
+## 0.0.2
+
+* Android: the feed, the full-screen presentation and identity go through the
+  native Kotlin SDK. `AppwinCommunityView` is rendered there in hybrid
+  composition.
+* Depends on `appwin_core` and re-exports it: `AppwinCore.instance.configure`
+  comes with this package, one App ID for every product.
+* `login` replays the session bootstrap on both platforms, so the calls that
+  follow carry the new identity rather than only doing so on iOS.
+
+## 0.0.1
+
+* Initial version: embeddable native iOS community feed
+  (`AppwinCommunityView`), full-screen presentation, identity (`login`,
+  `setUser`), notification badge.

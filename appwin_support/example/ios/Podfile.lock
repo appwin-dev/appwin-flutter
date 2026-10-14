@@ -1,0 +1,54 @@
+PODS:
+  - appwin_core (0.0.1):
+    - AppwinCore (< 1.0.0, >= 0.14.1)
+    - Flutter
+  - appwin_support (0.0.1):
+    - AppwinCore (< 1.0.0, >= 0.14.1)
+    - AppwinSupport (< 1.0.0, >= 0.14.1)
+    - Flutter
+  - AppwinCore (0.14.1)
+  - AppwinNotifications (0.14.1):
+    - AppwinCore (= 0.14.1)
+  - AppwinSupport (0.14.1):
+    - AppwinCore (= 0.14.1)
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - appwin_core (from `.symlinks/plugins/appwin_core/ios`)
+  - appwin_support (from `.symlinks/plugins/appwin_support/ios`)
+  - AppwinCore (from `../../../../appwin-ios`)
+  - AppwinNotifications (from `../../../../appwin-ios`)
+  - AppwinSupport (from `../../../../appwin-ios`)
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+
+EXTERNAL SOURCES:
+  appwin_core:
+    :path: ".symlinks/plugins/appwin_core/ios"
+  appwin_support:
+    :path: ".symlinks/plugins/appwin_support/ios"
+  AppwinCore:
+    :path: "../../../../appwin-ios"
+  AppwinNotifications:
+    :path: "../../../../appwin-ios"
+  AppwinSupport:
+    :path: "../../../../appwin-ios"
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+
+SPEC CHECKSUMS:
+  appwin_core: 6c5ae649640499069e29104f8da41415fe2a5144
+  appwin_support: 14574cded28712814e4b7f8dbf876dc246b8800f
+  AppwinCore: 3bd8672f0725899dd9fdbc14ba7f3a65c96b4dfb
+  AppwinNotifications: 329727627a89fdcc88107f8f8693c42611b2ba2b
+  AppwinSupport: ca45609776f725ed72dcd6193de4e99faf7c34db
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+
+PODFILE CHECKSUM: f323f3636188b3a40c55602510e96afe27f28c97
+
+COCOAPODS: 1.16.2

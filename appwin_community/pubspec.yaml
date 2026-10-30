@@ -1,0 +1,40 @@
+name: appwin_community
+description: "In-app community feed for Flutter apps: posts, comments, reactions and member profiles, rendered natively and moderated from the Appwin dashboard."
+version: 1.1.0
+homepage: https://appwin.io
+repository: https://github.com/appwin-dev/appwin-flutter/tree/main/appwin_community
+issue_tracker: https://github.com/appwin-dev/appwin-flutter/issues
+topics:
+  - appwin
+  - community
+  - social
+  - feed
+  - comments
+
+environment:
+  sdk: ^3.9.2
+  flutter: '>=3.35.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.0.2
+
+  # The foundation, like `firebase_core` for the Firebase packages: the studio
+  # installs a product and gets the single `configure` with it, without needing
+  # to know this package exists.
+  appwin_core: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  plugin:
+    platforms:
+      ios:
+        pluginClass: AppwinCommunityPlugin
+      android:
+        package: io.appwin.flutter.community
+        pluginClass: AppwinCommunityPlugin

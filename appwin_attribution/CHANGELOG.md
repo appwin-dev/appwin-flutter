@@ -1,0 +1,104 @@
+# Changelog
+
+Part of the Appwin SDK for Flutter: the six packages release together and
+share one version. History lives in the repository root CHANGELOG.
+
+## 1.4.2
+
+Native SDKs iOS 1.4.1 and Android 1.4.1, released with the other packages. Nothing changes in this package. No Dart API change.
+
+## 1.4.1
+
+Native SDKs iOS 1.3.1 and Android 1.3.1, released with the other packages. Nothing changes in this package. No Dart API change.
+
+## 1.4.0
+
+Native SDKs iOS 1.3.0 and Android 1.3.0, released with the other packages. Nothing changes in this package. No Dart API change.
+
+## 1.3.1
+
+Native SDKs iOS 1.2.1 and Android 1.2.1, released with the other packages. Nothing changes in this package. No Dart API change.
+
+## 1.3.0
+
+Native SDKs iOS 1.2.0 and Android 1.2.0. iOS: no longer depends on CocoaPods trunk, which becomes read-only on 2 December 2026. With Swift Package Manager (Flutter 3.41 or later) the plugin takes `appwin-ios` from GitHub; with CocoaPods it compiles the native iOS sources it ships, inside its own pod. After upgrading, run `pod install`: the `Appwin…` pods leave your `Podfile.lock`. Remove any `pod 'AppwinCore'` (or other `Appwin…` pod) you declared yourself. No Dart API change.
+
+## 1.2.0
+
+Native SDKs iOS 1.2.0 and Android 1.2.0. No API change on this side.
+
+## 1.1.0
+
+Native SDKs iOS 1.1.0 and Android 1.1.0. No API change on this side.
+
+## 1.0.0
+
+Native SDKs iOS 1.0.0 and Android 1.0.0. The public API is stable from now on and follows semantic versioning: no breaking change before 2.0.0; the symbols deprecated during 0.x keep working through 1.x. Builds with Xcode 26.0 (Swift 6.2).
+
+## 0.15.0
+
+Native SDKs iOS 0.15.0 and Android 0.15.0 (in-app moderation, see `appwin_community`). No API change on this side.
+
+## 0.14.2
+
+Native SDKs iOS 0.14.2 and Android 0.14.2 (community unread badge fix). No API change on this side.
+
+## 0.14.1
+
+Native SDKs iOS 0.14.1 and Android 0.14.1 (community UI polish). No API change on this side.
+
+## 0.14.0
+
+Native SDKs iOS 0.14.0 and Android 0.14.0 (profile editing on the community view, see `appwin_community`). No API change on this side.
+
+## 0.13.0
+
+Native SDKs iOS 0.13.0 and Android 0.13.0 (community fonts, see `appwin_community`). No API change on this side.
+
+## 0.12.0
+
+Native SDKs iOS 0.12.0 and Android 0.12.0 (community moderation, see `appwin_community`). No API change on this side.
+
+## 0.11.2
+
+Native SDKs iOS 0.11.1 and Android 0.11.2: session replay no longer makes the
+app stutter (see `appwin_analytics`). No API change on this side.
+
+## 0.11.1
+
+Android SDK 0.11.1: session replay fix in release builds (see `appwin_analytics`).
+No API change on this side.
+
+## 0.11.0
+
+Native SDKs 0.11.0: session replay in Analytics (see `appwin_analytics`).
+No API change on this side.
+
+## 0.10.0
+
+Native SDKs 0.10.0: crash reporting in Analytics, Community reactions and
+in-app banner, `registerPushToken` no longer fails on a transient 5xx/429.
+No API change on this side.
+
+## 0.9.2
+
+**Native SDKs 0.9.2.** Support and Community screens aligned on the InApp
+mockups: customizable gradient, `colorScheme` and `grayWarmth` from the
+dashboard, Help Center title and welcome message, "My inbox" hidden until a
+conversation exists. No API change on this side.
+
+## 0.9.1
+
+Native SDKs 0.9.1: `registerPushToken` waits for the session before posting
+and retries once with a fresh session after a 401 caused by a concurrent
+`identify`. No API change on the Dart side.
+
+## 0.9.0
+
+- Fixed: Swift Package Manager resolution. The plugin's `Package.swift` declared
+  the product `appwin-support` and depended on `AppwinSupport`; it now declares
+  `appwin-attribution` and depends on `AppwinCore` only. CocoaPods was not affected.
+
+## 0.8.0
+
+- Released with the rest of the Appwin SDK for Flutter 0.8.0. No change in this package; identity moved to `appwin_core` (see its changelog).
